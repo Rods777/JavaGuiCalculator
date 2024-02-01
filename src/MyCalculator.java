@@ -8,14 +8,15 @@ public class MyCalculator implements ActionListener {
 	
 	// Declaration
 	JFrame frame;
-	JTextField textField;
+	JTextField mainTextField, previewTextField;
 	JButton[] numButtons = new JButton[10]; // for number buttons
 	JButton[] opButtons = new JButton[9]; // Operational buttons
 	JButton addBtn, mulBtn, divBtn, subBtn;
 	JButton delBtn, clrBtn, eqBtn, decBtn, negBtn;
 	JPanel panel;
+	JLayeredPane layeredPane;
 	
-	Font myFont = new Font("Monospaced",Font.PLAIN,25);
+	Font myFont = new Font("Monospaced", Font.PLAIN, 25);
 	
 	double num1 = 0, num2 = 0, result = 0;
 	char operator;
@@ -23,20 +24,23 @@ public class MyCalculator implements ActionListener {
 	// Constructor
 	MyCalculator(){
 		
-		//Frame
-		frame = new JFrame("My Calculator");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(450, 550);
-		frame.getContentPane().setBackground(new Color(53, 47, 68));
-		frame.setResizable(false);
-		frame.setLocationRelativeTo(null);
-		frame.setLayout(null);
+		// Main Text Field
+		mainTextField = new JTextField();
+		mainTextField.setBounds(8, 5, 419, 105);
+//		mainTextField.setMargin(new Insets(10,10,10,10));
+		mainTextField.setFont(myFont);
+		mainTextField.setHorizontalAlignment(JTextField.RIGHT);
+		mainTextField.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+		mainTextField.setEditable(false);
 		
-		// Text Field
-		textField = new JTextField();
-		textField.setBounds(8, 5, 420, 105);
-		textField.setFont(myFont);
-		textField.setEditable(false);
+		// Preview Text Field
+		previewTextField = new JTextField();
+		previewTextField.setBounds(8, 5, 419, 40);
+		previewTextField.setFont(new Font("Monospaced", Font.ITALIC, 18));
+		previewTextField.setForeground(Color.GRAY);
+		previewTextField.setHorizontalAlignment(JTextField.RIGHT);
+		previewTextField.setBorder(BorderFactory.createEmptyBorder(10, 20 , 0, 20));
+		previewTextField.setEditable(false);
 		
 		// Buttons
 		divBtn = new JButton("\u00F7");
@@ -109,16 +113,35 @@ public class MyCalculator implements ActionListener {
 		panel.add(numButtons[0]);
 		panel.add(eqBtn);
 		
+		// Layered Pane
+		layeredPane = new JLayeredPane();
+		layeredPane.setBounds(0, 0, 450, 105);
+		layeredPane.setBorder(null);
+		layeredPane.add(mainTextField, Integer.valueOf(0));
+		layeredPane.add(previewTextField, Integer.valueOf(1));
 		
+		//Frame
+		frame = new JFrame("My Calculator");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(450, 550);
+		frame.getContentPane().setBackground(new Color(53, 47, 68));
+		frame.setResizable(false);
+		frame.setLocationRelativeTo(null); // to center the frame
+		frame.setLayout(null);
+		frame.add(layeredPane);
 		frame.add(panel);
-		frame.add(textField);
 		frame.setVisible(true);
 		
 	}
 	
 	public static void main(String[] args) {
 		
-		MyCalculator calc = new MyCalculator();
+		try {
+			MyCalculator calc = new MyCalculator();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
 		
 	}
 
@@ -128,36 +151,40 @@ public class MyCalculator implements ActionListener {
 		
 		for(int i = 0; i < 10; i++) { // For number btns
 			if(e.getSource() == numButtons[i]) {
-				textField.setText(textField.getText().concat(String.valueOf(i)));
+				mainTextField.setText(mainTextField.getText().concat(String.valueOf(i)));
 			}
 		}
 	
 		if (e.getSource() == decBtn) { // For decimal btn
-			textField.setText(textField.getText().concat("."));
+			mainTextField.setText(mainTextField.getText().concat("."));
 		}
 		
 		if (e.getSource() == addBtn) { // For add btn
-			num1 = Double.parseDouble(textField.getText());
+			num1 = Double.parseDouble(mainTextField.getText());
 			operator = '+';
-			textField.setText("");
+			previewTextField.setText(mainTextField.getText().concat("+"));
+			mainTextField.setText("");
 		}
 		if (e.getSource() == mulBtn) { // For mul btn
-			num1 = Double.parseDouble(textField.getText());
+			num1 = Double.parseDouble(mainTextField.getText());
 			operator = 'x';
-			textField.setText("");
+			previewTextField.setText(mainTextField.getText().concat("x"));
+			mainTextField.setText("");
 		}
 		if (e.getSource() == subBtn) { // For sub btn
-			num1 = Double.parseDouble(textField.getText());
+			num1 = Double.parseDouble(mainTextField.getText());
 			operator = '-';
-			textField.setText("");
+			previewTextField.setText(mainTextField.getText().concat("-"));
+			mainTextField.setText("");
 		}
 		if (e.getSource() == divBtn) { // For div btn
-			num1 = Double.parseDouble(textField.getText());
+			num1 = Double.parseDouble(mainTextField.getText());
 			operator = '\u00F7';
-			textField.setText("");
+			previewTextField.setText(mainTextField.getText().concat("\u00F7"));
+			mainTextField.setText("");
 		}
 		if (e.getSource() == eqBtn ) { // For equal btn
-			num2 = Double.parseDouble(textField.getText());
+			num2 = Double.parseDouble(mainTextField.getText());
 			
 			switch(operator) {
 				case '+':
@@ -173,36 +200,46 @@ public class MyCalculator implements ActionListener {
 					result = num1/num2;
 					break;
 				default:
-					textField.setText("Error");
+					mainTextField.setText("Error");
 			}
 			
 			// Checks if the answer is a whole number or decimal
 			if(result == (int)result) {
 				int intResult = (int)result; // conversion double to int
-				textField.setText(String.valueOf(intResult));
+				previewTextField.setText(previewTextField.getText().concat(String.valueOf((int)num2).concat("=")));
+				mainTextField.setText(String.valueOf(intResult));
 				num1 = result;
 			} else {
-				textField.setText(String.valueOf(result));
+				previewTextField.setText(previewTextField.getText().concat(String.valueOf(num2).concat("=")));
+				mainTextField.setText(String.valueOf(result));
 				num1 = result; // to continue operation after
 			}
 		}
 		
 		if (e.getSource() == clrBtn) { // For clr btn
-			textField.setText("");
+			previewTextField.setText("");
+			mainTextField.setText("");
 		}
 		
 		if (e.getSource() == delBtn) { // For del btn
-			String currentText = textField.getText();
-			textField.setText("");
+			String currentText = mainTextField.getText();
+			mainTextField.setText("");
 			for(int i = 0; i < (currentText.length()-1); i++) {
-				textField.setText(textField.getText() + currentText.charAt(i));
+				mainTextField.setText(mainTextField.getText() + currentText.charAt(i));
 			}
 		}
 		
 		if (e.getSource() == negBtn) { // For negative btn
-			double temp = Double.parseDouble(textField.getText());
+			double temp = Double.parseDouble(mainTextField.getText());
 			temp*=-1;
-			textField.setText(String.valueOf(temp));
+			// Checks if the temp is a whole number or decimal
+			if(temp == (int)temp) {
+				int intTemp = (int)temp;
+				mainTextField.setText(String.valueOf(intTemp));
+			} else {
+				mainTextField.setText(String.valueOf(temp));
+			}
+			
 		}
 		
 	}
