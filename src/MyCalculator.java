@@ -10,8 +10,8 @@ public class MyCalculator implements ActionListener {
 	JFrame frame;
 	JTextField mainTextField, previewTextField;
 	JButton[] numButtons = new JButton[10]; // for number buttons
-	JButton[] opButtons = new JButton[9]; // Operational buttons
-	JButton addBtn, mulBtn, divBtn, subBtn;
+	JButton[] opButtons = new JButton[10]; // Operational buttons
+	JButton addBtn, mulBtn, divBtn, subBtn, modBtn;
 	JButton delBtn, clrBtn, eqBtn, decBtn, negBtn;
 	JPanel panel;
 	JLayeredPane layeredPane;
@@ -27,7 +27,6 @@ public class MyCalculator implements ActionListener {
 		// Main Text Field
 		mainTextField = new JTextField();
 		mainTextField.setBounds(8, 5, 419, 105);
-//		mainTextField.setMargin(new Insets(10,10,10,10));
 		mainTextField.setFont(myFont);
 		mainTextField.setHorizontalAlignment(JTextField.RIGHT);
 		mainTextField.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -52,6 +51,7 @@ public class MyCalculator implements ActionListener {
 		clrBtn = new JButton("CE");
 		delBtn = new JButton("Delete");
 		negBtn = new JButton("(-)");
+		modBtn = new JButton("%");
 		
 		opButtons[0] = divBtn;
 		opButtons[1] = mulBtn;
@@ -62,10 +62,11 @@ public class MyCalculator implements ActionListener {
 		opButtons[6] = clrBtn;
 		opButtons[7] = delBtn;
 		opButtons[8] = negBtn;
+		opButtons[9] = modBtn;
 		
 		// Setting up properties/functionalities to each buttons in array
 		// For Operational Buttons
-		for(int i = 0; i < 9; i++) {
+		for(int i = 0; i < 10; i++) {
 			opButtons[i].addActionListener(this);
 			opButtons[i].setFont(new Font("Monospaced", Font.PLAIN, 15));
 			opButtons[i].setFocusable(false);
@@ -92,26 +93,27 @@ public class MyCalculator implements ActionListener {
 		panel.add(negBtn);
 		panel.add(clrBtn);
 		panel.add(delBtn);
-		panel.add(divBtn);
-		
+		panel.add(modBtn);
+			
 		panel.add(numButtons[7]);
 		panel.add(numButtons[8]);
 		panel.add(numButtons[9]);
-		panel.add(mulBtn);
+		panel.add(divBtn);
 		
 		panel.add(numButtons[4]);
 		panel.add(numButtons[5]);
 		panel.add(numButtons[6]);
-		panel.add(subBtn);
+		panel.add(mulBtn);
 		
 		panel.add(numButtons[3]);
 		panel.add(numButtons[2]);
 		panel.add(numButtons[1]);
-		panel.add(addBtn);
+		panel.add(subBtn);
 		
 		panel.add(decBtn);
 		panel.add(numButtons[0]);
 		panel.add(eqBtn);
+		panel.add(addBtn);
 		
 		// Layered Pane
 		layeredPane = new JLayeredPane();
@@ -183,6 +185,12 @@ public class MyCalculator implements ActionListener {
 			previewTextField.setText(mainTextField.getText().concat("\u00F7"));
 			mainTextField.setText("");
 		}
+		if (e.getSource() == modBtn) { // For mod btn
+			num1 = Double.parseDouble(mainTextField.getText());
+			operator = '%';
+			previewTextField.setText(mainTextField.getText().concat("%"));
+			mainTextField.setText("");
+		}
 		if (e.getSource() == eqBtn ) { // For equal btn
 			num2 = Double.parseDouble(mainTextField.getText());
 			
@@ -198,6 +206,9 @@ public class MyCalculator implements ActionListener {
 					break;
 				case '\u00F7':
 					result = num1/num2;
+					break;
+				case '%':
+					result = num1%num2;
 					break;
 				default:
 					mainTextField.setText("Error");
